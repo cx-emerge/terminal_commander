@@ -1,0 +1,13 @@
+[package]
+name = "terminal_commander"
+version = "0.1.0"
+authors = ["高翔 <263027768@qq.com>"]
+edition = "2018"
+
+[dependencies.tui]
+version = "0.9"
+default-features = false
+features = ["crossterm"]
+
+[dependencies.crossterm]
+version = "0.17"
