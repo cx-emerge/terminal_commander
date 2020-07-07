@@ -28,45 +28,55 @@ impl Component for FileWindow {
 		;
 
 		// 标签
-		let tabs = Tabs::default()
-			.block(Block::default().title("窗口标签").borders(Borders::ALL))
-			.titles(&["Tab1", "Tab2", "Tab3", "Tab4", "Tab5", "Tab6"])
+		let tabs_widget = Tabs::default()
+			.block(Block::default()
+				.title("窗口标签")
+				.title_style(Style::default().fg(Color::Gray))
+				.borders(Borders::ALL)
+				.border_style(Style::default().fg(Color::Gray))
+			)
+			.titles(&["projects"])
 			.style(Style::default().fg(Color::White))
 			.highlight_style(Style::default().fg(Color::Yellow))
 			.divider("|")
 		;
-		f.render_widget(tabs, chunks[0]);
+		f.render_widget(tabs_widget, chunks[0]);
 
 		// 路径
 		let text = [Text::raw("~/")];
-		let path = Paragraph::new(text.iter())
-			.block(Block::default().title("路径").borders(Borders::ALL))
+		let path_widget = Paragraph::new(text.iter())
+			.block(Block::default()
+				.title("路径")
+				.title_style(Style::default().fg(Color::Gray))
+				.borders(Borders::ALL)
+				.border_style(Style::default().fg(Color::Gray))
+			)
 			.style(Style::default().fg(Color::White).bg(Color::Black))
 			.wrap(true)
 		;
-		f.render_widget(path, chunks[1]);
+		f.render_widget(path_widget, chunks[1]);
 
 		// 文件列表
-		let row_style = Style::default().fg(Color::White);
-		let files = Table::new(
-				["Col1", "Col2", "Col3"].iter(),
+		let table_widths = [
+			Constraint::Length(area.width - 15 - 15),
+			Constraint::Length(15),
+			Constraint::Length(15),
+		];
+		let files_widget = Table::new(
+				["文件名", "文件大小", "修改时间",].iter(),
 				vec![
-					Row::StyledData(["Row11", "Row12", "Row13"].iter(), row_style),
-					Row::StyledData(["Row21", "Row22", "Row23"].iter(), row_style),
-					Row::StyledData(["Row31", "Row32", "Row33"].iter(), row_style),
-					Row::Data(["Row41", "Row42", "Row43"].iter())
+					Row::Data(["file_01.md", "100kb", "2020-7-7"].iter()),
+					Row::Data(["file_02.md", "100kb", "2020-7-7"].iter()),
+					Row::Data(["file_03.md", "100kb", "2020-7-7"].iter()),
 				].into_iter()
 			)
 			.block(Block::default().title("文件列表").borders(Borders::ALL))
 			.header_style(Style::default().fg(Color::Yellow))
-			.widths(&[
-				Constraint::Length(5),
-				Constraint::Length(5),
-				Constraint::Length(10)]
-			)
+			.widths(&table_widths)
 			.style(Style::default().fg(Color::White))
+			.highlight_style(Style::default().fg(Color::Yellow))
 			.column_spacing(1)
 		;
-		f.render_widget(files, chunks[2]);
+		f.render_widget(files_widget, chunks[2]);
 	}
 }

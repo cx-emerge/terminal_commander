@@ -49,8 +49,14 @@ pub fn draw(f: &mut Frame<impl Backend>) {
 		Text::raw("退出: Ctrl+c"),
 	];
 	let help_text_widget = Paragraph::new(help_text.iter())
-		.block(Block::default().title("帮助").borders(Borders::ALL))
-		.style(Style::default().fg(Color::White).bg(Color::Black))
+		.block(
+			Block::default()
+			.title("帮助")
+			.title_style(Style::default().fg(Color::Gray))
+			.borders(Borders::ALL)
+			.border_style(Style::default().fg(Color::Gray))
+		)
+		.style(Style::default().fg(Color::Gray))
 	;
 
 	f.render_widget(help_text_widget, main_chunks[1]);
