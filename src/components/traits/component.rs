@@ -1,3 +1,5 @@
+use std::error;
+
 use tui::{
 	Frame,
 	backend::Backend,
@@ -7,5 +9,9 @@ use tui::{
 
 /// 组件特性
 pub trait Component {
-	fn draw(&self, f: &mut Frame<impl Backend>, area: Rect);
+	fn draw(
+		&self,
+		f: &mut Frame<impl Backend>,
+		area: Rect
+	) -> Result<(), Box<dyn error::Error>>;
 }

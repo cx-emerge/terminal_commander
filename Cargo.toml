@@ -11,3 +11,9 @@ features = ["crossterm"]
 
 [dependencies.crossterm]
 version = "0.17"
+
+[dependencies.dirs]
+version = "3.0"
+
+[dependencies.chrono]
+version = "0.4"

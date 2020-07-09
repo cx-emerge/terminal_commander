@@ -1,3 +1,5 @@
+use std::error;
+
 use tui::{
 	Frame,
 	backend::Backend,
@@ -11,9 +13,14 @@ use crate::components::{
 	FileWindow,
 };
 
+use crate::store::Store;
+
 
 /// 绘制 UI
-pub fn draw(f: &mut Frame<impl Backend>) {
+pub fn draw(
+	f: &mut Frame<impl Backend>,
+	store: &mut Store
+) -> Result<(), Box<dyn error::Error>> {
 	// 主布局
 	let main_chunks = Layout::default()
 		.direction(Direction::Vertical)
@@ -37,12 +44,16 @@ pub fn draw(f: &mut Frame<impl Backend>) {
 	;
 
 	// 左侧文件窗口
-	let left_file_window = FileWindow {};
-	left_file_window.draw(f, file_windows_chunks[0]);
+	let left_file_window = FileWindow {
+		file_selected: store.file_window(0).file_index,
+	};
+	left_file_window.draw(f, file_windows_chunks[0])?;
 
 	// 右侧文件窗口
-	let right_file_window = FileWindow {};
-	right_file_window.draw(f, file_windows_chunks[1]);
+	let right_file_window = FileWindow {
+		file_selected: store.file_window(1).file_index,
+	};
+	right_file_window.draw(f, file_windows_chunks[1])?;
 
 	// 帮助文本
 	let help_text = [
@@ -60,4 +71,6 @@ pub fn draw(f: &mut Frame<impl Backend>) {
 	;
 
 	f.render_widget(help_text_widget, main_chunks[1]);
+
+	Ok(())
 }
