@@ -45,13 +45,13 @@ pub fn draw(
 
 	// 左侧文件窗口
 	let left_file_window = FileWindow {
-		file_selected: store.file_window(0).file_index,
+		file_selected: store.file_window(0, 0).file_index,
 	};
 	left_file_window.draw(f, file_windows_chunks[0])?;
 
 	// 右侧文件窗口
 	let right_file_window = FileWindow {
-		file_selected: store.file_window(1).file_index,
+		file_selected: store.file_window(1, 0).file_index,
 	};
 	right_file_window.draw(f, file_windows_chunks[1])?;
 

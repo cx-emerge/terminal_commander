@@ -7,10 +7,13 @@ use file_window::FileWindow;
 pub struct Store {
 
 	/// 当前激活的文件窗口
-	active_file_window: usize,
+	active_window: usize,
+
+	/// 窗口激活的标签
+	active_tab: Vec<usize>,
 
 	/// 文件窗口状态
-	file_windows: Vec<FileWindow>,
+	file_windows: Vec<Vec<FileWindow>>,
 
 }
 
@@ -20,29 +23,39 @@ impl Store {
 	/// 实例化 Store
 	pub fn new() -> Self {
 		return Store {
-			active_file_window: 0,
+			active_window: 0,
+			active_tab: vec![0, 0],
 			file_windows: vec![
-				FileWindow::new(),
-				FileWindow::new(),
+				vec![FileWindow::new(),],
+				vec![FileWindow::new(),],
 			],
 		};
 	}
 
 	/// 切换窗口
 	pub fn toggle_window(&mut self) {
-		self.active_file_window = [1, 0][self.active_file_window];
+		self.active_window = [1, 0][self.active_window];
 	}
 
 	/// 获取当前激活的文件窗口
 	pub fn active_file_window(&mut self) -> &mut FileWindow {
-		let file_window = self.file_window(self.active_file_window);
+		let window = self.active_window;
+		let tab = self.active_tab[window];
+
+		let file_window = self.file_window(window, tab);
 
 		return file_window;
 	}
 
 	/// 获取文件窗口
-	pub fn file_window(&mut self, index: usize) -> &mut FileWindow {
-		let ref mut file_window = self.file_windows[index];
+	///
+	/// - `window`: 窗口索引
+	/// - `tab`: 标签索引
+	pub fn file_window(&mut self,
+		window: usize,
+		tab: usize
+	) -> &mut FileWindow {
+		let ref mut file_window = self.file_windows[window][tab];
 
 		return file_window;
 	}
