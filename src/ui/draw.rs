@@ -4,14 +4,10 @@ use tui::{
 	Frame,
 	backend::Backend,
 	layout::{ Layout, Constraint, Direction, },
-	widgets::{ Block, Borders, Paragraph, Text, },
-	style::{ Style, Color, }
 };
 
-use crate::components::{
-	traits::Component,
-	FileWindow,
-};
+use super::draw_help;
+use super::draw_window;
 
 use crate::store::Store;
 
@@ -32,8 +28,8 @@ pub fn draw(
 		.split(f.size())
 	;
 
-	// 文件窗口布局
-	let file_windows_chunks = Layout::default()
+	// 窗口布局
+	let windows_chunks = Layout::default()
 		.direction(Direction::Horizontal)
 		.margin(0)
 		.constraints([
@@ -44,33 +40,25 @@ pub fn draw(
 	;
 
 	// 左侧文件窗口
-	let left_file_window = FileWindow {
-		file_selected: store.file_window(0, 0).file_index,
-	};
-	left_file_window.draw(f, file_windows_chunks[0])?;
+	let left_file_window = store.file_window(0, 0);
+	draw_window(f, windows_chunks[0],
+		draw_window::FileWindowOptions{
+			dir: left_file_window.dir.clone(),
+			current_index: left_file_window.current_index,
+		}
+	)?;
 
 	// 右侧文件窗口
-	let right_file_window = FileWindow {
-		file_selected: store.file_window(1, 0).file_index,
-	};
-	right_file_window.draw(f, file_windows_chunks[1])?;
+	let right_file_window = store.file_window(1, 0);
+	draw_window(f, windows_chunks[1],
+		draw_window::FileWindowOptions{
+			dir: right_file_window.dir.clone(),
+			current_index: right_file_window.current_index,
+		}
+	)?;
 
 	// 帮助文本
-	let help_text = [
-		Text::raw("退出: Ctrl+c"),
-	];
-	let help_text_widget = Paragraph::new(help_text.iter())
-		.block(
-			Block::default()
-			.title("帮助")
-			.title_style(Style::default().fg(Color::Gray))
-			.borders(Borders::ALL)
-			.border_style(Style::default().fg(Color::Gray))
-		)
-		.style(Style::default().fg(Color::Gray))
-	;
+	draw_help(f, main_chunks[1])?;
 
-	f.render_widget(help_text_widget, main_chunks[1]);
-
-	Ok(())
+	return Ok(());
 }
