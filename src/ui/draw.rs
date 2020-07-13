@@ -45,8 +45,9 @@ pub fn draw(
 	draw_window(f, windows_chunks[0],
 		draw_window::FileWindowOptions{
 			is_active: is_active,
-			dir: left_file_window.dir.clone(),
+			dir: &left_file_window.dir,
 			current_index: left_file_window.current_index,
+			list: &left_file_window.list,
 		}
 	)?;
 
@@ -56,8 +57,9 @@ pub fn draw(
 	draw_window(f, windows_chunks[1],
 		draw_window::FileWindowOptions{
 			is_active: is_active,
-			dir: right_file_window.dir.clone(),
+			dir: &right_file_window.dir,
 			current_index: right_file_window.current_index,
+			list: &right_file_window.list,
 		}
 	)?;
 

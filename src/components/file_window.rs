@@ -22,18 +22,21 @@ use chrono::{
 
 
 /// 文窗口
-pub struct FileWindow {
+pub struct FileWindow<'a> {
 	/// 是否为激活的
 	pub is_active: bool,
 
 	/// 目录路径
-	pub dir: String,
+	pub dir: &'a String,
 
 	/// 当前文件索引
 	pub current_index: usize,
+
+	/// 列表
+	pub list: &'a Vec<fs::DirEntry>,
 }
 
-impl Component for FileWindow {
+impl Component for FileWindow<'_> {
 	fn draw(
 		&self,
 		f: &mut Frame<impl Backend>,
@@ -82,12 +85,7 @@ impl Component for FileWindow {
 			Constraint::Length(created_item_width),
 		];
 		let table_header = [ "文件名", "文件大小", "修改时间", ];
-		let mut table_rows = fs::read_dir(self.dir.clone())?
-			.map(|entry| entry.unwrap())
-			.collect::<Vec<_>>()
-		;
-		table_rows.sort_by_key(|dir| dir.path());
-		let table_rows = table_rows.iter()
+		let table_rows = self.list.iter()
 			.map(|dir| {
 				let file_path = dir.path();
 				let file_metadata = dir.metadata().unwrap();

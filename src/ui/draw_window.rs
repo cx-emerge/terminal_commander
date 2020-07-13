@@ -1,4 +1,6 @@
-use std::error;
+use std::{
+	fs, error,
+};
 
 use tui::{
 	Frame,
@@ -14,12 +16,14 @@ use crate::components::{
 };
 
 
-pub struct FileWindowOptions {
+pub struct FileWindowOptions<'a> {
 	pub is_active: bool,
 
-	pub dir: String,
+	pub dir: &'a String,
 
 	pub current_index: usize,
+
+	pub list: &'a Vec<fs::DirEntry>,
 }
 
 
@@ -59,6 +63,7 @@ pub fn draw_window(
 		is_active: file_window_options.is_active,
 		dir: file_window_options.dir,
 		current_index: file_window_options.current_index,
+		list: file_window_options.list,
 	};
 	file_window_widget.draw(f, chunks[1])?;
 

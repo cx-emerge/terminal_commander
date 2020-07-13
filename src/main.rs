@@ -76,6 +76,20 @@ fn main() -> Result<(), Box<dyn error::Error>> {
 					store.active_file_window().back_to_top();
 				},
 
+				crossterm::event::KeyEvent {
+					code: crossterm::event::KeyCode::Char('o'),
+					modifiers: crossterm::event::KeyModifiers::NONE,
+				} => {
+					store.active_file_window().open();
+				},
+
+				crossterm::event::KeyEvent {
+					code: crossterm::event::KeyCode::Char('u'),
+					modifiers: crossterm::event::KeyModifiers::NONE,
+				} => {
+					store.active_file_window().up();
+				},
+
 				_ => {}
 			}
 		}
