@@ -15,6 +15,8 @@ use crate::components::{
 
 
 pub struct FileWindowOptions {
+	pub is_active: bool,
+
 	pub dir: String,
 
 	pub current_index: usize,
@@ -54,8 +56,9 @@ pub fn draw_window(
 
 	// 文件窗口
 	let file_window_widget = FileWindow {
+		is_active: file_window_options.is_active,
 		dir: file_window_options.dir,
-		file_selected: file_window_options.current_index,
+		current_index: file_window_options.current_index,
 	};
 	file_window_widget.draw(f, chunks[1])?;
 

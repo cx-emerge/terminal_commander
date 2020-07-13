@@ -23,11 +23,14 @@ use chrono::{
 
 /// 文窗口
 pub struct FileWindow {
+	/// 是否为激活的
+	pub is_active: bool,
+
 	/// 目录路径
 	pub dir: String,
 
-	/// 当前选的文件
-	pub file_selected: usize,
+	/// 当前文件索引
+	pub current_index: usize,
 }
 
 impl Component for FileWindow {
@@ -61,6 +64,9 @@ impl Component for FileWindow {
 		f.render_widget(path_widget, chunks[0]);
 
 		// 文件列表
+		let active_color = if self.is_active
+			{ Color::White } else { Color::Gray }
+		;
 		let mut table_state = TableState::default();
 		let size_item_width = 10;
 		let created_item_width = 23;
@@ -92,11 +98,11 @@ impl Component for FileWindow {
 					file_metadata.created().unwrap()
 				).format("%Y-%m-%d %H:%M:%S");
 
-				return Row::Data(vec![
+				return Row::StyledData(vec![
 					String::from(file_name),
 					file_size.to_string(),
 					file_created.to_string(),
-				].into_iter());
+				].into_iter(), Style::default().fg(active_color));
 			})
 			.collect::<Vec<_>>()
 		;
@@ -104,14 +110,19 @@ impl Component for FileWindow {
 				table_header.iter(),
 				table_rows.into_iter()
 			)
-			.block(Block::default().title("文件列表").borders(Borders::ALL))
+			.block(Block::default()
+				.title("文件列表")
+				.title_style(Style::default().fg(active_color))
+				.borders(Borders::ALL)
+				.border_style(Style::default().fg(active_color))
+			)
 			.header_style(Style::default().fg(Color::Yellow))
 			.widths(&table_widths)
 			.style(Style::default().fg(Color::White))
 			.highlight_style(Style::default().bg(Color::Blue))
 			.column_spacing(1)
 		;
-		table_state.select(Some(self.file_selected));
+		table_state.select(Some(self.current_index));
 		f.render_stateful_widget(files_widget, chunks[1], &mut table_state);
 
 		return Ok(());

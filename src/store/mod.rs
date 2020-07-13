@@ -7,7 +7,7 @@ use file_window::FileWindow;
 pub struct Store {
 
 	/// 当前激活的文件窗口
-	active_window: usize,
+	pub active_window: usize,
 
 	/// 窗口激活的标签
 	active_tab: Vec<usize>,

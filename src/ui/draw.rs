@@ -40,18 +40,22 @@ pub fn draw(
 	;
 
 	// 左侧文件窗口
+	let is_active = store.active_window == 0;
 	let left_file_window = store.file_window(0, 0);
 	draw_window(f, windows_chunks[0],
 		draw_window::FileWindowOptions{
+			is_active: is_active,
 			dir: left_file_window.dir.clone(),
 			current_index: left_file_window.current_index,
 		}
 	)?;
 
 	// 右侧文件窗口
+	let is_active = store.active_window == 1;
 	let right_file_window = store.file_window(1, 0);
 	draw_window(f, windows_chunks[1],
 		draw_window::FileWindowOptions{
+			is_active: is_active,
 			dir: right_file_window.dir.clone(),
 			current_index: right_file_window.current_index,
 		}
