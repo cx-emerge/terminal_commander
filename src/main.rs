@@ -19,6 +19,16 @@ use store::Store;
 
 
 fn main() -> Result<(), Box<dyn error::Error>> {
+	let pattern = std::env::args().nth(1);
+	if let Some(pattern) = pattern {
+		if pattern == "--version" {
+			println!("terminal commander {}", env!("CARGO_PKG_VERSION"));
+		}
+
+		return Ok(());
+	}
+
+
 	let mut store = Store::new();
 
 	crossterm::terminal::enable_raw_mode()?;
