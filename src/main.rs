@@ -1,6 +1,7 @@
 mod store;
 mod ui;
 mod components;
+mod configs;
 
 
 use std::{
@@ -53,50 +54,29 @@ fn main() -> Result<(), Box<dyn error::Error>> {
 
 		if let crossterm::event::Event::Key(key_event) = crossterm::event::read()? {
 			match key_event {
-				crossterm::event::KeyEvent {
-					code: crossterm::event::KeyCode::Char('c'),
-					modifiers: crossterm::event::KeyModifiers::CONTROL,
-				} => break,
+				configs::keys::QUIT => break,
 
-				crossterm::event::KeyEvent {
-					code: crossterm::event::KeyCode::Tab,
-					modifiers: crossterm::event::KeyModifiers::NONE,
-				} => {
+				configs::keys::TOGGLE_WINDOW => {
 					store.toggle_window();
 				},
 
-				crossterm::event::KeyEvent {
-					code: crossterm::event::KeyCode::Char('j'),
-					modifiers: crossterm::event::KeyModifiers::NONE,
-				} => {
+				configs::keys::FILES_CURSOR_NEXT => {
 					store.active_file_window().next();
 				},
 
-				crossterm::event::KeyEvent {
-					code: crossterm::event::KeyCode::Char('k'),
-					modifiers: crossterm::event::KeyModifiers::NONE,
-				} => {
+				configs::keys::FILES_CURSOR_PREV => {
 					store.active_file_window().prev();
 				},
 
-				crossterm::event::KeyEvent {
-					code: crossterm::event::KeyCode::Char('g'),
-					modifiers: crossterm::event::KeyModifiers::NONE,
-				} => {
+				configs::keys::FILES_CURSOR_TOP => {
 					store.active_file_window().back_to_top();
 				},
 
-				crossterm::event::KeyEvent {
-					code: crossterm::event::KeyCode::Char('o'),
-					modifiers: crossterm::event::KeyModifiers::NONE,
-				} => {
+				configs::keys::OPEN_DIR => {
 					store.active_file_window().open();
 				},
 
-				crossterm::event::KeyEvent {
-					code: crossterm::event::KeyCode::Char('u'),
-					modifiers: crossterm::event::KeyModifiers::NONE,
-				} => {
+				configs::keys::BACK_TO_THE_PARENT_DIRECTORY => {
 					store.active_file_window().up();
 				},
 

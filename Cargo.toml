@@ -1,16 +1,16 @@
 [package]
 name = "terminal_commander"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["高翔 <263027768@qq.com>"]
 edition = "2018"
 
 [dependencies.tui]
-version = "0.9"
+version = "0.12"
 default-features = false
 features = ["crossterm"]
 
 [dependencies.crossterm]
-version = "0.17"
+version = "0.18"
 
 [dependencies.dirs]
 version = "3.0"

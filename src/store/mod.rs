@@ -1,3 +1,5 @@
+//! 全局状态
+
 mod file_window;
 
 use file_window::FileWindow;

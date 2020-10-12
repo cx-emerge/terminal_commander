@@ -10,9 +10,10 @@ use tui::{
 	layout::{ Layout, Constraint, Direction, Rect, },
 	widgets::{
 		Block, Borders,
-		Paragraph, Text,
+		Paragraph, Wrap,
 		TableState, Table, Row,
 	},
+	text::{ Spans, Span, },
 	style::{ Style, Color, },
 };
 
@@ -21,7 +22,7 @@ use chrono::{
 };
 
 
-/// 文窗口
+/// 文件窗口
 pub struct FileWindow<'a> {
 	/// 是否为激活的
 	pub is_active: bool,
@@ -53,16 +54,19 @@ impl Component for FileWindow<'_> {
 		;
 
 		// 路径
-		let text = [Text::raw(self.dir.clone())];
-		let path_widget = Paragraph::new(text.iter())
+		let text = vec![
+			Spans::from(Span::raw(self.dir.clone()))
+		];
+		let path_widget = Paragraph::new(text)
 			.block(Block::default()
-				.title("路径")
-				.title_style(Style::default().fg(Color::Gray))
+				.title(Spans::from(
+					Span::styled("路径", Style::default().fg(Color::Gray))
+				))
 				.borders(Borders::ALL)
 				.border_style(Style::default().fg(Color::Gray))
 			)
 			.style(Style::default().fg(Color::Gray))
-			.wrap(true)
+			.wrap(Wrap { trim: true })
 		;
 		f.render_widget(path_widget, chunks[0]);
 
@@ -109,8 +113,9 @@ impl Component for FileWindow<'_> {
 				table_rows.into_iter()
 			)
 			.block(Block::default()
-				.title("文件列表")
-				.title_style(Style::default().fg(active_color))
+				.title(Spans::from(
+					Span::styled("文件列表", Style::default().fg(active_color))
+				))
 				.borders(Borders::ALL)
 				.border_style(Style::default().fg(active_color))
 			)

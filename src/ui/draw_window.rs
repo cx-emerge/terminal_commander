@@ -7,6 +7,7 @@ use tui::{
 	backend::Backend,
 	layout::{ Layout, Constraint, Direction, Rect, },
 	widgets::{ Block, Borders, Tabs, },
+	text::{ Spans, Span, },
 	style::{ Style, Color, },
 };
 
@@ -44,14 +45,16 @@ pub fn draw_window(
 	;
 
 	// 标签
-	let tabs_widget = Tabs::default()
+	let tabs_widget = Tabs::new(
+		["projects"].iter().cloned().map(Spans::from).collect()
+	)
 		.block(Block::default()
-			.title("窗口标签")
-			.title_style(Style::default().fg(Color::Gray))
+			.title(Spans::from(
+				Span::styled("窗口标签", Style::default().fg(Color::Gray))
+			))
 			.borders(Borders::ALL)
 			.border_style(Style::default().fg(Color::Gray))
 		)
-		.titles(&["projects"])
 		.style(Style::default().fg(Color::White))
 		.highlight_style(Style::default().fg(Color::Yellow))
 		.divider("|")
