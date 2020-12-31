@@ -96,14 +96,14 @@ impl Component for FileWindow<'_> {
 
 				let file_name = file_path.file_name().unwrap().to_str().unwrap();
 				let file_size = file_metadata.len();
-				let file_created = DateTime::<Utc>::from(
-					file_metadata.created().unwrap()
+				let file_modified = DateTime::<Utc>::from(
+					file_metadata.modified().unwrap()
 				).format("%Y-%m-%d %H:%M:%S");
 
 				return Row::StyledData(vec![
 					String::from(file_name),
 					file_size.to_string(),
-					file_created.to_string(),
+					file_modified.to_string(),
 				].into_iter(), Style::default().fg(active_color));
 			})
 			.collect::<Vec<_>>()

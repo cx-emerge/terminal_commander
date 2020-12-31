@@ -5,7 +5,7 @@ mod configs;
 
 
 use std::{
-	io, io::Write,
+	io,
 	error,
 	time,
 };
