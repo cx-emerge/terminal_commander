@@ -46,3 +46,11 @@ pub const DELETE: (KeyCode, KeyModifiers) = (KeyCode::Delete, KeyModifiers::NONE
 
 /// 搜索文件列表
 pub const SEARCH: (KeyCode, KeyModifiers) = (KeyCode::Char('/'), KeyModifiers::NONE);
+
+
+/// 新建文件
+pub const CREATE_FILE: (KeyCode, KeyModifiers) = (KeyCode::F(4), KeyModifiers::SHIFT);
+
+
+/// 复制到另一栏
+pub const COPY_TO_OTHER_WINDOW: (KeyCode, KeyModifiers) = (KeyCode::F(5), KeyModifiers::NONE);

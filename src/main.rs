@@ -20,8 +20,10 @@ use store::Store;
 
 enum PromptAction {
 	CreateDirectory,
+	CreateFile,
 	Rename,
 	Delete,
+	CopyConfirm,
 }
 
 
@@ -58,8 +60,10 @@ fn main() -> Result<(), Box<dyn error::Error>> {
 		let prompt_view = prompt.as_ref().map(|(action, name)| {
 			let label = match action {
 				PromptAction::CreateDirectory => "新建目录: ",
+				PromptAction::CreateFile => "新建文件: ",
 				PromptAction::Rename => "重命名: ",
 				PromptAction::Delete => "删除所选项？(y/n): ",
+				PromptAction::CopyConfirm => "目标已存在，覆盖？(y/n): ",
 			};
 			(label, name.as_str())
 		});
@@ -98,10 +102,14 @@ fn main() -> Result<(), Box<dyn error::Error>> {
 			}
 
 			if let Some((action, name)) = prompt.as_mut() {
-				if matches!(action, PromptAction::Delete) {
+				if matches!(action, PromptAction::Delete | PromptAction::CopyConfirm) {
 					match key_event.code {
 						crossterm::event::KeyCode::Char('y') | crossterm::event::KeyCode::Char('Y') => {
-							let _ = store.active_file_window().delete_current();
+							if matches!(action, PromptAction::Delete) {
+								let _ = store.delete_current();
+							} else {
+								let _ = store.copy_current_to_other_window(true);
+							}
 							prompt = None;
 						},
 						crossterm::event::KeyCode::Char('n') | crossterm::event::KeyCode::Char('N') | crossterm::event::KeyCode::Esc => prompt = None,
@@ -115,8 +123,10 @@ fn main() -> Result<(), Box<dyn error::Error>> {
 						if !name.is_empty() {
 							match action {
 								PromptAction::CreateDirectory => { let _ = store.active_file_window().create_directory(name); },
+								PromptAction::CreateFile => { let _ = store.active_file_window().create_file(name); },
 								PromptAction::Rename => { let _ = store.active_file_window().rename_current(name); },
 								PromptAction::Delete => {},
+								PromptAction::CopyConfirm => {},
 							}
 						}
 						prompt = None;
@@ -143,6 +153,16 @@ fn main() -> Result<(), Box<dyn error::Error>> {
 				},
 
 				configs::keys::CREATE_DIRECTORY => prompt = Some((PromptAction::CreateDirectory, String::new())),
+
+				configs::keys::CREATE_FILE => prompt = Some((PromptAction::CreateFile, String::new())),
+
+				configs::keys::COPY_TO_OTHER_WINDOW => {
+					if let Err(error) = store.copy_current_to_other_window(false) {
+						if error.kind() == std::io::ErrorKind::AlreadyExists {
+							prompt = Some((PromptAction::CopyConfirm, String::new()));
+						}
+					}
+				},
 
 				configs::keys::RENAME => prompt = Some((PromptAction::Rename, String::new())),
 

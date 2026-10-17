@@ -109,6 +109,16 @@ impl FileWindow {
 		Ok(())
 	}
 
+	/// 在当前目录创建文件
+	pub fn create_file(&mut self, name: &str) -> std::io::Result<()> {
+		fs::OpenOptions::new()
+			.write(true)
+			.create_new(true)
+			.open(Path::new(&self.dir).join(name))?;
+		self.update_list_at(name);
+		Ok(())
+	}
+
 	/// 重命名当前选中项
 	pub fn rename_current(&mut self, name: &str) -> std::io::Result<()> {
 		let Some(current) = self.list.get(self.current_index) else {
@@ -128,6 +138,40 @@ impl FileWindow {
 		let previous_index = self.current_index;
 		self.list = FileWindow::get_list(&self.dir);
 		self.current_index = previous_index.min(self.list.len().saturating_sub(1));
+		Ok(())
+	}
+
+	/// 将当前选中项复制到另一栏
+	pub fn copy_current_to(&self, destination: &mut FileWindow, overwrite: bool) -> std::io::Result<()> {
+		let Some(current) = self.list.get(self.current_index) else {
+			return Ok(());
+		};
+
+		let source = current.path();
+		let name = current.file_name();
+		let target = Path::new(&destination.dir).join(&name);
+		if source.is_dir() && target.starts_with(&source) {
+			return Err(std::io::Error::new(
+				std::io::ErrorKind::InvalidInput,
+				"cannot copy a directory into itself",
+			));
+		}
+		if fs::symlink_metadata(&target).is_ok() {
+			if !overwrite {
+				return Err(std::io::Error::new(
+					std::io::ErrorKind::AlreadyExists,
+					"destination already exists",
+				));
+			}
+			if fs::symlink_metadata(&target)?.file_type().is_dir() {
+				fs::remove_dir_all(&target)?;
+			} else {
+				fs::remove_file(&target)?;
+			}
+		}
+
+		FileWindow::copy_path(&source, &target)?;
+		destination.update_list_at(&name.to_string_lossy());
 		Ok(())
 	}
 
@@ -152,12 +196,25 @@ impl FileWindow {
 	}
 
 	fn get_list(dir: &String) -> Vec<fs::DirEntry> {
-		let mut list = fs::read_dir(dir).unwrap()
-			.map(|entry| entry.unwrap())
-			.collect::<Vec<_>>()
-		;
-		list.sort_by_key(|dir| dir.path().to_str().unwrap().to_lowercase());
+		let Ok(entries) = fs::read_dir(dir) else {
+			return Vec::new();
+		};
+		let mut list = entries.filter_map(Result::ok).collect::<Vec<_>>();
+		list.sort_by_key(|entry| entry.path().to_string_lossy().to_lowercase());
 
 		return list;
+	}
+
+	fn copy_path(source: &Path, destination: &Path) -> std::io::Result<()> {
+		if source.is_dir() {
+			fs::create_dir_all(destination)?;
+			for entry in fs::read_dir(source)? {
+				let entry = entry?;
+				FileWindow::copy_path(&entry.path(), &destination.join(entry.file_name()))?;
+			}
+		} else {
+			fs::copy(source, destination)?;
+		}
+		Ok(())
 	}
 }

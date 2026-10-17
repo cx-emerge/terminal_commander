@@ -62,4 +62,40 @@ impl Store {
 		return file_window;
 	}
 
+	/// 将当前选中项复制到另一栏
+	pub fn copy_current_to_other_window(&mut self, overwrite: bool) -> std::io::Result<()> {
+		let source_window = self.active_window;
+		let destination_window = 1 - source_window;
+		let source_tab = self.active_tab[source_window];
+		let destination_tab = self.active_tab[destination_window];
+		let (source, destination) = if source_window == 0 {
+			let (left, right) = self.file_windows.split_at_mut(1);
+			(&left[0][source_tab], &mut right[0][destination_tab])
+		} else {
+			let (left, right) = self.file_windows.split_at_mut(1);
+			(&right[0][source_tab], &mut left[0][destination_tab])
+		};
+
+		source.copy_current_to(destination, overwrite)
+	}
+
+	/// 删除当前选中项，并刷新指向相同目录的另一栏
+	pub fn delete_current(&mut self) -> Result<(), trash::Error> {
+		let source_window = self.active_window;
+		let destination_window = 1 - source_window;
+		let source_tab = self.active_tab[source_window];
+		let destination_tab = self.active_tab[destination_window];
+		let (source_dir, result) = {
+			let source = self.file_window(source_window, source_tab);
+			let dir = source.dir.clone();
+			let result = source.delete_current();
+			(dir, result)
+		};
+		let destination = self.file_window(destination_window, destination_tab);
+		if destination.dir == source_dir {
+			destination.update_list();
+		}
+		result
+	}
+
 }

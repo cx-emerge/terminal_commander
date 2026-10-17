@@ -87,21 +87,23 @@ impl Component for FileWindow<'_> {
 		];
 		let table_header = [ "文件名", "文件大小", "修改时间", ];
 		let table_rows = self.list.iter()
-			.map(|dir| {
+			.filter_map(|dir| {
 				let file_path = dir.path();
-				let file_metadata = dir.metadata().unwrap();
+				let Ok(file_metadata) = dir.metadata() else {
+					return None;
+				};
 
 				let file_name = file_path.file_name().unwrap().to_str().unwrap();
 				let file_size = file_metadata.len();
-				let file_modified = DateTime::<Utc>::from(
-					file_metadata.modified().unwrap()
-				).format("%Y-%m-%d %H:%M:%S");
+				let file_modified = file_metadata.modified().ok()
+					.map(|modified| DateTime::<Utc>::from(modified).format("%Y-%m-%d %H:%M:%S").to_string())
+					.unwrap_or_else(|| String::from("-"));
 
-				return Row::new(vec![
+				Some(Row::new(vec![
 					String::from(file_name),
 					file_size.to_string(),
-					file_modified.to_string(),
-				]).style(Style::default().fg(active_color));
+					file_modified,
+				]).style(Style::default().fg(active_color)))
 			})
 			.collect::<Vec<_>>()
 		;
