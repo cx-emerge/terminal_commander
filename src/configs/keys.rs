@@ -30,3 +30,11 @@ pub const OPEN_DIR: (KeyCode, KeyModifiers) = (KeyCode::Char('o'), KeyModifiers:
 
 /// 返回上级目录
 pub const BACK_TO_THE_PARENT_DIRECTORY: (KeyCode, KeyModifiers) = (KeyCode::Char('u'), KeyModifiers::NONE);
+
+
+/// 新建目录
+pub const CREATE_DIRECTORY: (KeyCode, KeyModifiers) = (KeyCode::F(7), KeyModifiers::NONE);
+
+
+/// 重命名
+pub const RENAME: (KeyCode, KeyModifiers) = (KeyCode::F(2), KeyModifiers::NONE);

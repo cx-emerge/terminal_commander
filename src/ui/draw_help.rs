@@ -23,6 +23,10 @@ pub fn draw_help(
 		Span::raw(" | "),
 		Span::raw("返回: u"),
 		Span::raw(" | "),
+		Span::raw("新建目录: F7"),
+		Span::raw(" | "),
+		Span::raw("重命名: F2"),
+		Span::raw(" | "),
 		Span::raw("退出: Ctrl+c"),
 	]);
 

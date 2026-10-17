@@ -18,6 +18,11 @@ use crossterm;
 
 use store::Store;
 
+enum PromptAction {
+	CreateDirectory,
+	Rename,
+}
+
 
 fn main() -> Result<(), Box<dyn error::Error>> {
 	let pattern = std::env::args().nth(1);
@@ -31,6 +36,7 @@ fn main() -> Result<(), Box<dyn error::Error>> {
 
 
 	let mut store = Store::new();
+	let mut prompt: Option<(PromptAction, String)> = None;
 
 	crossterm::terminal::enable_raw_mode()?;
 
@@ -46,7 +52,10 @@ fn main() -> Result<(), Box<dyn error::Error>> {
 	terminal.clear()?;
 
 	loop {
-		terminal.draw(|mut f| match ui::draw(&mut f, &mut store) { _ => {}, })?;
+		terminal.draw(|mut f| match ui::draw(&mut f, &mut store, prompt.as_ref().map(|(action, name)| (match action {
+			PromptAction::CreateDirectory => "新建目录: ",
+			PromptAction::Rename => "重命名: ",
+		}, name.as_str()))) { _ => {}, })?;
 
 		if !crossterm::event::poll(time::Duration::from_millis(250))? {
 			continue;
@@ -57,8 +66,31 @@ fn main() -> Result<(), Box<dyn error::Error>> {
 				continue;
 			}
 
+			if let Some((action, name)) = prompt.as_mut() {
+				match key_event.code {
+					crossterm::event::KeyCode::Enter => {
+						if !name.is_empty() {
+							match action {
+								PromptAction::CreateDirectory => { let _ = store.active_file_window().create_directory(name); },
+								PromptAction::Rename => { let _ = store.active_file_window().rename_current(name); },
+							}
+						}
+						prompt = None;
+					},
+					crossterm::event::KeyCode::Esc => prompt = None,
+					crossterm::event::KeyCode::Backspace => { name.pop(); },
+					crossterm::event::KeyCode::Char(ch) => name.push(ch),
+					_ => {},
+				}
+				continue;
+			}
+
 			match (key_event.code, key_event.modifiers) {
 				configs::keys::QUIT => break,
+
+				configs::keys::CREATE_DIRECTORY => prompt = Some((PromptAction::CreateDirectory, String::new())),
+
+				configs::keys::RENAME => prompt = Some((PromptAction::Rename, String::new())),
 
 				configs::keys::TOGGLE_WINDOW => {
 					store.toggle_window();

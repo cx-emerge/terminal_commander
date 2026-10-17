@@ -92,6 +92,23 @@ impl FileWindow {
 		self.update_list();
 	}
 
+	/// 在当前目录创建目录
+	pub fn create_directory(&mut self, name: &str) -> std::io::Result<()> {
+		fs::create_dir(Path::new(&self.dir).join(name))?;
+		self.update_list_at(name);
+		Ok(())
+	}
+
+	/// 重命名当前选中项
+	pub fn rename_current(&mut self, name: &str) -> std::io::Result<()> {
+		let Some(current) = self.list.get(self.current_index) else {
+			return Ok(());
+		};
+		fs::rename(current.path(), Path::new(&self.dir).join(name))?;
+		self.update_list_at(name);
+		Ok(())
+	}
+
 	/// 更新列表
 	pub fn update_list(&mut self) {
 		let list = FileWindow::get_list(&self.dir);
@@ -99,6 +116,13 @@ impl FileWindow {
 		self.list = list;
 
 		self.current_index = 0;
+	}
+
+	fn update_list_at(&mut self, name: &str) {
+		self.list = FileWindow::get_list(&self.dir);
+		self.current_index = self.list.iter()
+			.position(|entry| entry.file_name() == name)
+			.unwrap_or(0);
 	}
 
 	fn get_list(dir: &String) -> Vec<fs::DirEntry> {

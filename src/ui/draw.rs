@@ -2,7 +2,10 @@ use std::error;
 
 use ratatui::{
 	Frame,
-	layout::{ Layout, Constraint, Direction, },
+	layout::{ Layout, Constraint, Direction, Rect, },
+	widgets::{ Block, Borders, Clear, Paragraph },
+	style::{ Color, Style },
+	text::{ Line, Span },
 };
 
 use super::draw_help;
@@ -14,7 +17,8 @@ use crate::store::Store;
 /// 绘制 UI
 pub fn draw(
 		f: &mut Frame<'_>,
-	store: &mut Store
+	store: &mut Store,
+	prompt: Option<(&str, &str)>,
 ) -> Result<(), Box<dyn error::Error>> {
 	// 主布局
 	let main_chunks = Layout::default()
@@ -64,6 +68,17 @@ pub fn draw(
 
 	// 帮助文本
 	draw_help(f, main_chunks[1])?;
+
+	if let Some((label, name)) = prompt {
+		let area = f.area();
+		let prompt = Rect::new(area.width / 4, area.height / 2, area.width / 2, 3);
+		f.render_widget(Clear, prompt);
+		f.render_widget(
+			Paragraph::new(Line::from(vec![Span::raw(label), Span::raw(name)]))
+				.block(Block::default().borders(Borders::ALL).border_style(Style::default().fg(Color::Yellow))),
+			prompt,
+		);
+	}
 
 	return Ok(());
 }
