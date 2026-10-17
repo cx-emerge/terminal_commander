@@ -9,6 +9,7 @@ use ratatui::{
 };
 
 use super::draw_help;
+use super::draw_command;
 use super::draw_window;
 
 use crate::store::Store;
@@ -26,6 +27,7 @@ pub fn draw(
 		.margin(0)
 		.constraints([
 			Constraint::Min(0),
+			Constraint::Length(3),
 			Constraint::Length(3)
 		].as_ref())
 		.split(f.area())
@@ -66,8 +68,11 @@ pub fn draw(
 		}
 	)?;
 
+	// 命令栏
+	draw_command(f, main_chunks[1])?;
+
 	// 帮助文本
-	draw_help(f, main_chunks[1])?;
+	draw_help(f, main_chunks[2])?;
 
 	if let Some((label, name)) = prompt {
 		let area = f.area();

@@ -9,3 +9,6 @@ use draw_window::draw_window;
 
 mod draw_help;
 use draw_help::*;
+
+mod draw_command;
+use draw_command::*;
