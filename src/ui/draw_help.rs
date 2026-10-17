@@ -29,6 +29,8 @@ pub fn draw_help(
 		Span::raw(" | "),
 		Span::raw("删除: Delete"),
 		Span::raw(" | "),
+		Span::raw("过滤: /"),
+		Span::raw(" | "),
 		Span::raw("退出: Ctrl+c"),
 	]);
 

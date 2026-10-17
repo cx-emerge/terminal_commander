@@ -16,6 +16,9 @@ pub struct FileWindow {
 
 	/// 列表
 	pub list: Vec<fs::DirEntry>,
+
+	/// 列表过滤词
+	pub filter: String,
 }
 
 
@@ -32,12 +35,13 @@ impl FileWindow {
 			dir: home_dir,
 			current_index: 0,
 			list: list,
+			filter: String::new(),
 		};
 	}
 
 	/// 下一个文件
 	pub fn next(&mut self) {
-		if self.current_index == self.list.len() - 1 {
+		if self.list.is_empty() || self.current_index >= self.list.len() - 1 {
 			return;
 		}
 
@@ -56,6 +60,12 @@ impl FileWindow {
 	/// 返回顶部
 	pub fn back_to_top(&mut self) {
 		self.current_index = 0;
+	}
+
+	/// 更新列表过滤词
+	pub fn set_filter(&mut self, filter: &str) {
+		self.filter = filter.to_string();
+		self.update_list();
 	}
 
 	/// 打开目录
@@ -123,7 +133,11 @@ impl FileWindow {
 
 	/// 更新列表
 	pub fn update_list(&mut self) {
-		let list = FileWindow::get_list(&self.dir);
+		let filter = self.filter.to_lowercase();
+		let list = FileWindow::get_list(&self.dir)
+			.into_iter()
+			.filter(|entry| entry.file_name().to_string_lossy().to_lowercase().contains(&filter))
+			.collect();
 
 		self.list = list;
 
@@ -131,7 +145,7 @@ impl FileWindow {
 	}
 
 	fn update_list_at(&mut self, name: &str) {
-		self.list = FileWindow::get_list(&self.dir);
+		self.update_list();
 		self.current_index = self.list.iter()
 			.position(|entry| entry.file_name() == name)
 			.unwrap_or(0);

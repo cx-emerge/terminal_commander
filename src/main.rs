@@ -38,6 +38,8 @@ fn main() -> Result<(), Box<dyn error::Error>> {
 
 	let mut store = Store::new();
 	let mut prompt: Option<(PromptAction, String)> = None;
+	let mut search_focused = false;
+	let mut search_active = false;
 
 	crossterm::terminal::enable_raw_mode()?;
 
@@ -53,11 +55,15 @@ fn main() -> Result<(), Box<dyn error::Error>> {
 	terminal.clear()?;
 
 	loop {
-		terminal.draw(|mut f| match ui::draw(&mut f, &mut store, prompt.as_ref().map(|(action, name)| (match action {
-			PromptAction::CreateDirectory => "新建目录: ",
-			PromptAction::Rename => "重命名: ",
-			PromptAction::Delete => "删除所选项？(y/n): ",
-		}, name.as_str()))) { _ => {}, })?;
+		let prompt_view = prompt.as_ref().map(|(action, name)| {
+			let label = match action {
+				PromptAction::CreateDirectory => "新建目录: ",
+				PromptAction::Rename => "重命名: ",
+				PromptAction::Delete => "删除所选项？(y/n): ",
+			};
+			(label, name.as_str())
+		});
+		terminal.draw(|mut f| match ui::draw(&mut f, &mut store, prompt_view, search_focused, search_active) { _ => {}, })?;
 
 		if !crossterm::event::poll(time::Duration::from_millis(250))? {
 			continue;
@@ -65,6 +71,29 @@ fn main() -> Result<(), Box<dyn error::Error>> {
 
 		if let crossterm::event::Event::Key(key_event) = crossterm::event::read()? {
 			if key_event.kind != crossterm::event::KeyEventKind::Press {
+				continue;
+			}
+
+			if search_focused {
+				match key_event.code {
+					crossterm::event::KeyCode::Enter => search_focused = false,
+					crossterm::event::KeyCode::Esc => {
+						store.active_file_window().set_filter("");
+						search_focused = false;
+						search_active = false;
+					},
+					crossterm::event::KeyCode::Backspace => {
+						let mut filter = store.active_file_window().filter.clone();
+						filter.pop();
+						store.active_file_window().set_filter(&filter);
+					},
+					crossterm::event::KeyCode::Char(ch) if key_event.modifiers == crossterm::event::KeyModifiers::NONE => {
+						let mut filter = store.active_file_window().filter.clone();
+						filter.push(ch);
+						store.active_file_window().set_filter(&filter);
+					},
+					_ => {},
+				}
 				continue;
 			}
 
@@ -103,6 +132,16 @@ fn main() -> Result<(), Box<dyn error::Error>> {
 			match (key_event.code, key_event.modifiers) {
 				configs::keys::QUIT => break,
 
+				configs::keys::SEARCH => {
+					search_focused = true;
+					search_active = true;
+				},
+
+				(crossterm::event::KeyCode::Esc, crossterm::event::KeyModifiers::NONE) if search_active => {
+					store.active_file_window().set_filter("");
+					search_active = false;
+				},
+
 				configs::keys::CREATE_DIRECTORY => prompt = Some((PromptAction::CreateDirectory, String::new())),
 
 				configs::keys::RENAME => prompt = Some((PromptAction::Rename, String::new())),
@@ -126,11 +165,25 @@ fn main() -> Result<(), Box<dyn error::Error>> {
 				},
 
 				configs::keys::OPEN_DIR => {
-					store.active_file_window().open();
+					let file_window = store.active_file_window();
+					let previous_dir = file_window.dir.clone();
+					file_window.open();
+					if file_window.dir != previous_dir {
+						file_window.set_filter("");
+						search_focused = false;
+						search_active = false;
+					}
 				},
 
 				configs::keys::BACK_TO_THE_PARENT_DIRECTORY => {
-					store.active_file_window().up();
+					let file_window = store.active_file_window();
+					let previous_dir = file_window.dir.clone();
+					file_window.up();
+					if file_window.dir != previous_dir {
+						file_window.set_filter("");
+						search_focused = false;
+						search_active = false;
+					}
 				},
 
 				_ => {}

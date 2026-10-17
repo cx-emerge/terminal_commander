@@ -42,3 +42,7 @@ pub const RENAME: (KeyCode, KeyModifiers) = (KeyCode::F(2), KeyModifiers::NONE);
 
 /// 删除到回收站
 pub const DELETE: (KeyCode, KeyModifiers) = (KeyCode::Delete, KeyModifiers::NONE);
+
+
+/// 搜索文件列表
+pub const SEARCH: (KeyCode, KeyModifiers) = (KeyCode::Char('/'), KeyModifiers::NONE);

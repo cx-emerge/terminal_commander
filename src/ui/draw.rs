@@ -20,6 +20,8 @@ pub fn draw(
 		f: &mut Frame<'_>,
 	store: &mut Store,
 	prompt: Option<(&str, &str)>,
+	search_focused: bool,
+	search_active: bool,
 ) -> Result<(), Box<dyn error::Error>> {
 	// 主布局
 	let main_chunks = Layout::default()
@@ -69,7 +71,9 @@ pub fn draw(
 	)?;
 
 	// 命令栏
-	draw_command(f, main_chunks[1])?;
+	let active_window = store.active_window;
+	let filter = &store.file_window(active_window, 0).filter;
+	draw_command(f, main_chunks[1], filter, search_focused, search_active)?;
 
 	// 帮助文本
 	draw_help(f, main_chunks[2])?;
