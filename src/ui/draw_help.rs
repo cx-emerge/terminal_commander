@@ -27,6 +27,8 @@ pub fn draw_help(
 		Span::raw(" | "),
 		Span::raw("重命名: F2"),
 		Span::raw(" | "),
+		Span::raw("删除: Delete"),
+		Span::raw(" | "),
 		Span::raw("退出: Ctrl+c"),
 	]);
 

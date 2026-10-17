@@ -109,6 +109,18 @@ impl FileWindow {
 		Ok(())
 	}
 
+	/// 将当前选中项移至回收站
+	pub fn delete_current(&mut self) -> Result<(), trash::Error> {
+		let Some(current) = self.list.get(self.current_index) else {
+			return Ok(());
+		};
+		trash::delete(current.path())?;
+		let previous_index = self.current_index;
+		self.list = FileWindow::get_list(&self.dir);
+		self.current_index = previous_index.min(self.list.len().saturating_sub(1));
+		Ok(())
+	}
+
 	/// 更新列表
 	pub fn update_list(&mut self) {
 		let list = FileWindow::get_list(&self.dir);

@@ -38,3 +38,7 @@ pub const CREATE_DIRECTORY: (KeyCode, KeyModifiers) = (KeyCode::F(7), KeyModifie
 
 /// 重命名
 pub const RENAME: (KeyCode, KeyModifiers) = (KeyCode::F(2), KeyModifiers::NONE);
+
+
+/// 删除到回收站
+pub const DELETE: (KeyCode, KeyModifiers) = (KeyCode::Delete, KeyModifiers::NONE);

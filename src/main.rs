@@ -21,6 +21,7 @@ use store::Store;
 enum PromptAction {
 	CreateDirectory,
 	Rename,
+	Delete,
 }
 
 
@@ -55,6 +56,7 @@ fn main() -> Result<(), Box<dyn error::Error>> {
 		terminal.draw(|mut f| match ui::draw(&mut f, &mut store, prompt.as_ref().map(|(action, name)| (match action {
 			PromptAction::CreateDirectory => "新建目录: ",
 			PromptAction::Rename => "重命名: ",
+			PromptAction::Delete => "删除所选项？(y/n): ",
 		}, name.as_str()))) { _ => {}, })?;
 
 		if !crossterm::event::poll(time::Duration::from_millis(250))? {
@@ -67,12 +69,25 @@ fn main() -> Result<(), Box<dyn error::Error>> {
 			}
 
 			if let Some((action, name)) = prompt.as_mut() {
+				if matches!(action, PromptAction::Delete) {
+					match key_event.code {
+						crossterm::event::KeyCode::Char('y') | crossterm::event::KeyCode::Char('Y') => {
+							let _ = store.active_file_window().delete_current();
+							prompt = None;
+						},
+						crossterm::event::KeyCode::Char('n') | crossterm::event::KeyCode::Char('N') | crossterm::event::KeyCode::Esc => prompt = None,
+						_ => {},
+					}
+					continue;
+				}
+
 				match key_event.code {
 					crossterm::event::KeyCode::Enter => {
 						if !name.is_empty() {
 							match action {
 								PromptAction::CreateDirectory => { let _ = store.active_file_window().create_directory(name); },
 								PromptAction::Rename => { let _ = store.active_file_window().rename_current(name); },
+								PromptAction::Delete => {},
 							}
 						}
 						prompt = None;
@@ -91,6 +106,8 @@ fn main() -> Result<(), Box<dyn error::Error>> {
 				configs::keys::CREATE_DIRECTORY => prompt = Some((PromptAction::CreateDirectory, String::new())),
 
 				configs::keys::RENAME => prompt = Some((PromptAction::Rename, String::new())),
+
+				configs::keys::DELETE => prompt = Some((PromptAction::Delete, String::new())),
 
 				configs::keys::TOGGLE_WINDOW => {
 					store.toggle_window();
