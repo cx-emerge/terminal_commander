@@ -4,6 +4,7 @@ version = "0.2.1"
 authors = ["高翔 <263027768@qq.com>"]
 edition = "2024"
 
+
 [dependencies.ratatui]
 version = "0.30"
 
@@ -18,3 +19,8 @@ version = "0.4"
 
 [dependencies.trash]
 version = "5.2"
+
+
+[[bin]]
+name = "termcmd"
+path = "src/main.rs"
