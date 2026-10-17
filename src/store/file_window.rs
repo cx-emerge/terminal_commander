@@ -200,7 +200,10 @@ impl FileWindow {
 			return Vec::new();
 		};
 		let mut list = entries.filter_map(Result::ok).collect::<Vec<_>>();
-		list.sort_by_key(|entry| entry.path().to_string_lossy().to_lowercase());
+		list.sort_by_key(|entry| (
+			entry.file_type().map(|file_type| !file_type.is_dir()).unwrap_or(true),
+			entry.path().to_string_lossy().to_lowercase(),
+		));
 
 		return list;
 	}
