@@ -94,14 +94,14 @@ impl Component for FileWindow<'_> {
 				};
 
 				let file_name = file_path.file_name().unwrap().to_str().unwrap();
-				let file_size = file_metadata.len();
+				let file_size = format_file_size(file_metadata.len());
 				let file_modified = file_metadata.modified().ok()
 					.map(|modified| DateTime::<Utc>::from(modified).format("%Y-%m-%d %H:%M:%S").to_string())
 					.unwrap_or_else(|| String::from("-"));
 
 				Some(Row::new(vec![
 					String::from(file_name),
-					file_size.to_string(),
+					file_size,
 					file_modified,
 				]).style(Style::default().fg(active_color)))
 			})
@@ -124,5 +124,21 @@ impl Component for FileWindow<'_> {
 		f.render_stateful_widget(files_widget, chunks[1], &mut table_state);
 
 		return Ok(());
+	}
+}
+
+fn format_file_size(size: u64) -> String {
+	let units = ["B", "KB", "MB", "GB", "TB", "PB"];
+	let mut value = size as f64;
+	let mut unit = 0;
+	while value >= 1024.0 && unit < units.len() - 1 {
+		value /= 1024.0;
+		unit += 1;
+	}
+
+	if unit == 0 {
+		format!("{} {}", size, units[unit])
+	} else {
+		format!("{:.1} {}", value, units[unit])
 	}
 }
