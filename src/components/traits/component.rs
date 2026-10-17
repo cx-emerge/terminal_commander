@@ -1,8 +1,7 @@
 use std::error;
 
-use tui::{
+use ratatui::{
 	Frame,
-	backend::Backend,
 	layout::{ Rect, },
 };
 
@@ -11,7 +10,7 @@ use tui::{
 pub trait Component {
 	fn draw(
 		&self,
-		f: &mut Frame<impl Backend>,
+		f: &mut Frame<'_>,
 		area: Rect
 	) -> Result<(), Box<dyn error::Error>>;
 }

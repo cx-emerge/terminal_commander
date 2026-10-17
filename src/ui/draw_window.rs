@@ -2,12 +2,11 @@ use std::{
 	fs, error,
 };
 
-use tui::{
+use ratatui::{
 	Frame,
-	backend::Backend,
 	layout::{ Layout, Constraint, Direction, Rect, },
 	widgets::{ Block, Borders, Tabs, },
-	text::{ Spans, Span, },
+	text::{ Line, Span, },
 	style::{ Style, Color, },
 };
 
@@ -30,7 +29,7 @@ pub struct FileWindowOptions<'a> {
 
 /// 绘制窗口
 pub fn draw_window(
-	f: &mut Frame<impl Backend>,
+		f: &mut Frame<'_>,
 	area: Rect,
 	file_window_options: FileWindowOptions
 ) -> Result<(), Box<dyn error::Error>> {
@@ -46,10 +45,10 @@ pub fn draw_window(
 
 	// 标签
 	let tabs_widget = Tabs::new(
-		["projects"].iter().cloned().map(Spans::from).collect()
+		["projects"].iter().cloned().map(Line::from)
 	)
 		.block(Block::default()
-			.title(Spans::from(
+			.title(Line::from(
 				Span::styled("窗口标签", Style::default().fg(Color::Gray))
 			))
 			.borders(Borders::ALL)

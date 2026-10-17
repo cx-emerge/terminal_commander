@@ -4,16 +4,15 @@ use std::{
 	fs, error,
 };
 
-use tui::{
+use ratatui::{
 	Frame,
-	backend::Backend,
 	layout::{ Layout, Constraint, Direction, Rect, },
 	widgets::{
 		Block, Borders,
 		Paragraph, Wrap,
 		TableState, Table, Row,
 	},
-	text::{ Spans, Span, },
+	text::{ Line, Span, },
 	style::{ Style, Color, },
 };
 
@@ -40,7 +39,7 @@ pub struct FileWindow<'a> {
 impl Component for FileWindow<'_> {
 	fn draw(
 		&self,
-		f: &mut Frame<impl Backend>,
+		f: &mut Frame<'_>,
 		area: Rect
 	) -> Result<(), Box<dyn error::Error>> {
 		let chunks = Layout::default()
@@ -54,12 +53,10 @@ impl Component for FileWindow<'_> {
 		;
 
 		// 路径
-		let text = vec![
-			Spans::from(Span::raw(self.dir.clone()))
-		];
+		let text = vec![Line::from(Span::raw(self.dir.clone()))];
 		let path_widget = Paragraph::new(text)
 			.block(Block::default()
-				.title(Spans::from(
+				.title(Line::from(
 					Span::styled("路径", Style::default().fg(Color::Gray))
 				))
 				.borders(Borders::ALL)
@@ -100,29 +97,25 @@ impl Component for FileWindow<'_> {
 					file_metadata.modified().unwrap()
 				).format("%Y-%m-%d %H:%M:%S");
 
-				return Row::StyledData(vec![
+				return Row::new(vec![
 					String::from(file_name),
 					file_size.to_string(),
 					file_modified.to_string(),
-				].into_iter(), Style::default().fg(active_color));
+				]).style(Style::default().fg(active_color));
 			})
 			.collect::<Vec<_>>()
 		;
-		let files_widget = Table::new(
-				table_header.iter(),
-				table_rows.into_iter()
-			)
+		let files_widget = Table::new(table_rows, table_widths)
 			.block(Block::default()
-				.title(Spans::from(
+				.title(Line::from(
 					Span::styled("文件列表", Style::default().fg(active_color))
 				))
 				.borders(Borders::ALL)
 				.border_style(Style::default().fg(active_color))
 			)
-			.header_style(Style::default().fg(Color::Yellow))
-			.widths(&table_widths)
+			.header(Row::new(table_header).style(Style::default().fg(Color::Yellow)))
 			.style(Style::default().fg(Color::White))
-			.highlight_style(Style::default().bg(Color::Blue))
+			.row_highlight_style(Style::default().bg(Color::Blue))
 			.column_spacing(1)
 		;
 		table_state.select(Some(self.current_index));

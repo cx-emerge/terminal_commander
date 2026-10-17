@@ -10,7 +10,7 @@ use std::{
 	time,
 };
 
-use tui::{
+use ratatui::{
 	Terminal,
 	backend::CrosstermBackend,
 };
@@ -53,7 +53,11 @@ fn main() -> Result<(), Box<dyn error::Error>> {
 		}
 
 		if let crossterm::event::Event::Key(key_event) = crossterm::event::read()? {
-			match key_event {
+			if key_event.kind != crossterm::event::KeyEventKind::Press {
+				continue;
+			}
+
+			match (key_event.code, key_event.modifiers) {
 				configs::keys::QUIT => break,
 
 				configs::keys::TOGGLE_WINDOW => {

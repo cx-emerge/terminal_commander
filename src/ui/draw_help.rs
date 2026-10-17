@@ -1,21 +1,20 @@
 use std::error;
 
-use tui::{
+use ratatui::{
 	Frame,
-	backend::Backend,
 	layout::{ Rect, },
 	widgets::{ Block, Borders, Paragraph, },
-	text::{ Spans, Span },
+	text::{ Line, Span },
 	style::{ Style, Color, },
 };
 
 
 /// 绘制帮助栏
 pub fn draw_help(
-	f: &mut Frame<impl Backend>,
+		f: &mut Frame<'_>,
 	area: Rect
 ) -> Result<(), Box<dyn error::Error>> {
-	let help_text = Spans::from(vec![
+	let help_text = Line::from(vec![
 		Span::raw("切换窗口: Tab"),
 		Span::raw(" | "),
 		Span::raw("移动: j(上),k(下)"),
@@ -30,7 +29,7 @@ pub fn draw_help(
 	let help_text_widget = Paragraph::new(help_text)
 		.block(
 			Block::default()
-			.title(Spans::from(
+			.title(Line::from(
 				Span::styled("帮助", Style::default().fg(Color::Gray))
 			))
 			.borders(Borders::ALL)

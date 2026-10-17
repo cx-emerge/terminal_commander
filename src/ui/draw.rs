@@ -1,8 +1,7 @@
 use std::error;
 
-use tui::{
+use ratatui::{
 	Frame,
-	backend::Backend,
 	layout::{ Layout, Constraint, Direction, },
 };
 
@@ -14,7 +13,7 @@ use crate::store::Store;
 
 /// 绘制 UI
 pub fn draw(
-	f: &mut Frame<impl Backend>,
+		f: &mut Frame<'_>,
 	store: &mut Store
 ) -> Result<(), Box<dyn error::Error>> {
 	// 主布局
@@ -25,7 +24,7 @@ pub fn draw(
 			Constraint::Min(0),
 			Constraint::Length(3)
 		].as_ref())
-		.split(f.size())
+		.split(f.area())
 	;
 
 	// 窗口布局
