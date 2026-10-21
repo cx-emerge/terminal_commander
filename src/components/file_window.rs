@@ -96,7 +96,7 @@ impl Component for FileWindow<'_> {
 
 				let file_name = file_path.file_name().unwrap().to_str().unwrap();
 				let file_size = format_file_size(file_metadata.len());
-				let name_color = if index == self.current_index {
+				let name_color = if self.is_active && index == self.current_index {
 					Color::White
 				} else if file_metadata.is_dir() {
 					Color::Cyan
@@ -128,7 +128,9 @@ impl Component for FileWindow<'_> {
 			.row_highlight_style(Style::default().bg(Color::Blue))
 			.column_spacing(1)
 		;
-		table_state.select(Some(self.current_index));
+		if self.is_active {
+			table_state.select(Some(self.current_index));
+		}
 		f.render_stateful_widget(files_widget, chunks[1], &mut table_state);
 
 		return Ok(());
