@@ -68,6 +68,16 @@ impl FileWindow {
 		self.update_list();
 	}
 
+	/// 刷新当前目录列表并保留文件焦点
+	pub fn refresh(&mut self) {
+		let previous_index = self.current_index;
+		let selected_name = self.list.get(previous_index).map(|entry| entry.file_name());
+		self.update_list();
+		self.current_index = selected_name
+			.and_then(|name| self.list.iter().position(|entry| entry.file_name() == name))
+			.unwrap_or_else(|| previous_index.min(self.list.len().saturating_sub(1)));
+	}
+
 	/// 打开目录
 	pub fn open(&mut self) {
 		if self.list.len() == 0 {

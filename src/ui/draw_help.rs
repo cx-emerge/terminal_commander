@@ -29,6 +29,8 @@ pub fn draw_help(
 		Span::raw(" | "),
 		Span::raw("复制: F5"),
 		Span::raw(" | "),
+		Span::raw("刷新: Shift+R"),
+		Span::raw(" | "),
 		Span::raw("重命名: F2"),
 		Span::raw(" | "),
 		Span::raw("删除: Delete"),

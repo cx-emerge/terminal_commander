@@ -54,3 +54,7 @@ pub const CREATE_FILE: (KeyCode, KeyModifiers) = (KeyCode::F(4), KeyModifiers::S
 
 /// 复制到另一栏
 pub const COPY_TO_OTHER_WINDOW: (KeyCode, KeyModifiers) = (KeyCode::F(5), KeyModifiers::NONE);
+
+
+/// 刷新当前文件列表
+pub const REFRESH: (KeyCode, KeyModifiers) = (KeyCode::Char('R'), KeyModifiers::SHIFT);

@@ -164,6 +164,8 @@ fn main() -> Result<(), Box<dyn error::Error>> {
 					}
 				},
 
+				configs::keys::REFRESH => store.active_file_window().refresh(),
+
 				configs::keys::RENAME => prompt = Some((PromptAction::Rename, String::new())),
 
 				configs::keys::DELETE => prompt = Some((PromptAction::Delete, String::new())),
